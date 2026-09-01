@@ -1,12 +1,15 @@
-FROM eclipse-temurin:21-jdk
+FROM maven:3.9-eclipse-temurin-21
 
 WORKDIR /app
 
 COPY . .
 
-RUN chmod +x mvnw
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
-EXPOSE 8080
+FROM eclipse-temurin:21-jdk
 
-CMD ["sh", "-c", "java -jar target/*.jar --server.port=${PORT}"]
+WORKDIR /app
+
+COPY --from=0 /app/target/*.jar app.jar
+
+CMD ["sh", "-c", "java -jar app.jar --server.port=${PORT}"]
